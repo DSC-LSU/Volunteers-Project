@@ -1,4 +1,4 @@
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, render_template
 from flask_cors import CORS
 from models import Project, Volunteer
 from flask_migrate import Migrate
@@ -22,12 +22,14 @@ def paginate_results(results):
 @requires_auth('get:projects')
 def get_projects(payload):
     projects = Project.query.all()
-    return jsonify({
-        'success': True,
-        'projects': [project.format() for project in
-                     paginate_results(projects)],
-        'count_projects': len(projects)
-    })
+    # return jsonify({
+    #     'success': True,
+    #     'projects': [project.format() for project in
+    #                  paginate_results(projects)],
+    #     'count_projects': len(projects)
+    # })
+    projects = [project.format() for project in paginate_results(projects)]
+    return render_template("projects.html", projects=projects)
 
 
 @app.route('/volunteers', methods=['GET'])

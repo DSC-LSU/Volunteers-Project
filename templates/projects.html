@@ -27,29 +27,45 @@
 </head>
 
 <body>
-<ul>
-    <form>
-        <label for="name">Name</label>
-        <input id="name" type="text" name="name">
-        <button type="submit">Add project</button>
-    </form>
+<form>
+    <label for="name">Name</label>
+    <input id="name" type="text" name="name" required="required">
+    <label for="description">Description</label>
+    <input id="description" type="text" name="description" required="required">
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" required="required">
+    <label for="phone">Phone</label>
+    <input id="phone" type="tel" name="phone" required="required">
+    <button type="submit">Add project</button>
+</form>
 
-    <!-- {% for project in projects %}
+<ul>
+    {% for project in projects %}
     <li>
         <div>
-            <b>Id: {{ volunteer.id }}</b>
-            <h2>{{ volunteer.name }}</h2>
-            <button data-id="{{ volunteer.id }}">&cross;</button>
+            <b>Id: {{ project.id }}</b>
+            <h2>{{ project.name }}</h2>
+            <h4>{{ project.description }}</h4>
+            <b>Email: {{ project.email }}</b>
+            <br>
+            <b>Phone: {{ project.phone }}</b>
+            <br>
+            <button data-id="{{ project.id }}">&cross;</button>
         </div>
     </li>
-    {% endfor %} -->
+    {% endfor %}
 </ul>
 
 <template>
     <li>
         <div>
-            <b></b>
-            <h2></h2>
+            <b class="id"></b>
+            <h2 class="name"></h2>
+            <h4 class="description"></h4>
+            <b class="email"></b>
+            <br>
+            <b class="phone"></b>
+            <br>
             <button>&cross;</button>
         </div>
     </li>
@@ -60,10 +76,16 @@
     form.onsubmit = function (e) {
         e.preventDefault();
         let name = document.getElementById('name').value;
-        fetch('/volunteers', {
+        let description = document.getElementById('description').value;
+        let email = document.getElementById('email').value;
+        let phone = document.getElementById('phone').value;
+        fetch('/projects', {
             method: 'POST',
             body: JSON.stringify({
-                'name': name
+                'name': name,
+                'description': description,
+                'email': email,
+                'phone': phone
             }),
             headers: {
                 'Content-Type': 'application/json'
@@ -73,7 +95,7 @@
         }).then(function (jsonResponse) {
             console.log(jsonResponse);
             if (jsonResponse['success']) {
-                template = populateTemplate(jsonResponse['volunteer']['id'], name);
+                template = populateTemplate(jsonResponse['project']['id'], name, description, email, phone);
                 ul = document.querySelector('ul');
                 ul.appendChild(template);
             } else {
@@ -85,13 +107,19 @@
         })
     }
 
-    function populateTemplate(id, name) {
+    function populateTemplate(id, name, description, email, phone) {
         template = document.querySelector('template');
         template = template.content.cloneNode(true);
-        subtitle = template.querySelector('b');
-        subtitle.innerHTML = 'Id: ' + id;
-        title = template.querySelector('h2');
-        title.innerHTML = name;
+        idNode = template.querySelector('.id');
+        idNode.innerHTML = 'Id: ' + id;
+        nameNode = template.querySelector('.name');
+        nameNode.innerHTML = name;
+        descriptionNode = template.querySelector('.description');
+        descriptionNode.innerHTML = description;
+        emailNode = template.querySelector('.email');
+        emailNode.innerHTML = email;
+        phoneNode = template.querySelector('.phone');
+        phoneNode.innerHTML = phone;
         deleteButton = template.querySelector('button');
         deleteButton.setAttribute('data-id', id);
         addDeleteButtonClickListener(deleteButton);
@@ -107,8 +135,8 @@
 
     function addDeleteButtonClickListener(button) {
         button.onclick = function (e) {
-            volunteer_id = e.target.dataset['id']
-            fetch('/volunteers/' + volunteer_id, {
+            project_id = e.target.dataset['id']
+            fetch('/projects/' + project_id, {
                 method: 'DELETE'
             }).then(function (response) {
                 return response.json()
@@ -117,11 +145,11 @@
                     ul = document.querySelector('ul');
                     ul.removeChild(e.target.parentNode.parentNode);
                 } else {
-                    alert('Error deleting the volunteer');
+                    alert('Error deleting the project');
                 }
             }).catch(function (e) {
                 console.log(e);
-                alert('Error deleting the volunteer');
+                alert('Error deleting the project');
             })
         }
     }
