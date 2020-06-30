@@ -1,0 +1,22 @@
+div 
+{
+    display: inline-block;
+    vertical-align: top;
+}
+
+li button 
+{
+    cursor: pointer;
+    outline: none;
+    color: red;
+}
+
+li 
+{
+    border: solid;
+    border-color: red;
+    margin-top: 24px;
+    padding: 8px;
+    border-width: 1px;
+    clear: both;
+}
